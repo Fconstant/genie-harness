@@ -14,7 +14,7 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "@ai-sdk/openai": "^4.0.8",
+    "@ai-sdk/openai-compatible": "^3.0.5",
     "mastra": "^1.18.1"
   }
 }

@@ -25,12 +25,12 @@ The system SHALL accumulate all turns (user, assistant, tool results) in a messa
 - **THEN** each call includes full prior history including previous tool results
 
 ### Requirement: Configurable via environment variables
-The system SHALL read OPENAI_API_KEY, MODEL (default gpt-4o), MAX_ITERATIONS (default 10), and API_BASE_URL (default https://api.openai.com/v1) from environment.
+The system SHALL read API_KEY, MODEL (default openai/gpt-4o), MAX_ITERATIONS (default 10), and API_BASE_URL (default https://openrouter.ai/api/v1) from environment. It SHALL fall back to OPENAI_API_KEY if API_KEY is not set.
 
 #### Scenario: Custom model configured
-- **WHEN** MODEL env var is set to "gpt-4o-mini"
-- **THEN** agent sends requests with model: "gpt-4o-mini"
+- **WHEN** MODEL env var is set to "openai/gpt-4o-mini"
+- **THEN** agent sends requests with model: "openai/gpt-4o-mini"
 
 #### Scenario: Custom API endpoint
 - **WHEN** API_BASE_URL is set to a local endpoint
-- **THEN** agent sends requests to that endpoint instead of OpenAI
+- **THEN** agent sends requests to that endpoint instead of OpenRouter

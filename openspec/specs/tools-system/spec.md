@@ -7,7 +7,7 @@ Provides a safe, sandboxed tool suite for the agent to read, write, list, and ex
 ## Requirements
 
 ### Requirement: Tool suite exposes read, write, list, and run
-The system SHALL provide at minimum: read_file(path), write_file(path, content), list_dir(path), and run_command(command) tools using OpenAI function-calling schema.
+The system SHALL provide at minimum: read_file(path), write_file(path, content), list_dir(path), and run_command(command) tools using LLM tool-calling schema.
 
 #### Scenario: Read file returns content
 - **WHEN** agent calls read_file with a valid path
@@ -32,7 +32,7 @@ The system SHALL restrict file operations to a configurable SANDBOX_DIR (default
 - **WHEN** agent calls read_file with "../../etc/passwd"
 - **THEN** tool returns an error message and does not read the file
 
-### Requirement: Tools are declared in OpenAI tool-calling format
+### Requirement: Tools are declared in LLM tool-calling format
 The system SHALL expose tool definitions as an array of OpenAI-compatible JSON tool objects sent with each LLM request.
 
 #### Scenario: Tools sent with first request

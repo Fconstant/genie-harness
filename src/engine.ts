@@ -1,22 +1,27 @@
 import { Agent } from "@mastra/core/agent";
-import { createOpenAI } from "@ai-sdk/openai";
+import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 import { tools } from "./tools";
 import { generateCurse } from "./curse";
 
 export type SessionMessage = { role: "user" | "assistant"; content: string };
 
 export function createAgent(): { agent: Agent; curse: string } {
-  const apiKey = process.env.OPENAI_API_KEY;
+  const apiKey = process.env.API_KEY || process.env.OPENAI_API_KEY;
   if (!apiKey) {
-    throw new Error("Missing OPENAI_API_KEY in .env");
+    throw new Error("Missing API_KEY (or OPENAI_API_KEY) in .env");
   }
 
-  const model = process.env.MODEL || "gpt-4o";
-  const apiBaseUrl = process.env.API_BASE_URL;
+  if (process.env.OPENAI_API_KEY && !process.env.API_KEY) {
+    console.warn("OPENAI_API_KEY is deprecated, use API_KEY instead");
+  }
 
-  const provider = createOpenAI({
+  const model = process.env.MODEL || "openai/gpt-4o";
+  const apiBaseUrl = process.env.API_BASE_URL || "https://openrouter.ai/api/v1";
+
+  const provider = createOpenAICompatible({
+    name: "openrouter",
     apiKey,
-    ...(apiBaseUrl ? { baseURL: apiBaseUrl } : {}),
+    baseURL: apiBaseUrl,
   });
 
   const curse = generateCurse();
@@ -53,10 +58,12 @@ export async function generate(
   }
 
   // Multi-turn: pass messages array
-  const messages = input.map((msg) => ({
-    role: msg.role,
-    content: msg.content,
-  }));
+  const messages = input.map((msg) => {
+    if (msg.role === "user") {
+      return { role: "user" as const, content: msg.content };
+    }
+    return { role: "assistant" as const, content: msg.content };
+  });
 
   return agent.generate(messages, baseOpts);
 }
