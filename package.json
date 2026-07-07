@@ -1,0 +1,20 @@
+{
+  "name": "mini-harness",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "bin": "./src/cli.ts",
+  "scripts": {
+    "cli": "bun run src/cli.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@ai-sdk/openai": "^4.0.8",
+    "mastra": "^1.18.1"
+  }
+}

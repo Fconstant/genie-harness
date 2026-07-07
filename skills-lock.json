@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "codebase-documenter": {
+      "source": "sundial-org/awesome-openclaw-skills",
+      "sourceType": "github",
+      "skillPath": "skills/codebase-documenter/SKILL.md",
+      "computedHash": "42f8267717c269dd643a1e3c179ffdab09783bd10469deea83852dda8a1b22cd"
+    }
+  }
+}
