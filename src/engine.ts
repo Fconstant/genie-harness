@@ -5,9 +5,15 @@ import { generateCurse } from "./curse";
 
 export type SessionMessage = { role: "user" | "assistant"; content: string };
 
+const MODEL = process.env.MODEL || "openai/gpt-4o";
+const API_BASE_URL = process.env.API_BASE_URL || "https://openrouter.ai/api/v1";
+const TOOL_NAMES = Object.keys(tools).join(", ");
+const TOOL_NOTE = `The tools available to you for this wish are: ${TOOL_NAMES}. Use them whenever a wish requires reading or changing the sandbox.`;
+const MODEL_NOTE = `You are running on the LLM model "${MODEL}" via the ${API_BASE_URL} provider.`;
+const API_KEY = process.env.API_KEY || process.env.OPENAI_API_KEY;
+
 export function createAgent(): { agent: Agent; curse: string } {
-  const apiKey = process.env.API_KEY || process.env.OPENAI_API_KEY;
-  if (!apiKey) {
+  if (!API_KEY) {
     throw new Error("Missing API_KEY (or OPENAI_API_KEY) in .env");
   }
 
@@ -15,13 +21,10 @@ export function createAgent(): { agent: Agent; curse: string } {
     console.warn("OPENAI_API_KEY is deprecated, use API_KEY instead");
   }
 
-  const model = process.env.MODEL || "openai/gpt-4o";
-  const apiBaseUrl = process.env.API_BASE_URL || "https://openrouter.ai/api/v1";
-
   const provider = createOpenAICompatible({
     name: "openrouter",
-    apiKey,
-    baseURL: apiBaseUrl,
+    apiKey: API_KEY,
+    baseURL: API_BASE_URL,
   });
 
   const curse = generateCurse();
@@ -29,8 +32,8 @@ export function createAgent(): { agent: Agent; curse: string } {
   const agent = new Agent({
     id: "genie-agent",
     name: "Cursed Genie",
-    instructions: curse,
-    model: provider(model),
+    instructions: `${curse}\n\n${MODEL_NOTE}\n\n${TOOL_NOTE}`,
+    model: provider(MODEL),
     tools,
   });
 

@@ -9,7 +9,7 @@ if (!prompt) {
 
 const { agent, curse } = createAgent();
 
-console.log(`🧞 Curse: ${curse.split("\n")[3]}`);
+console.log(`🧞 Curse: ${curse.split("\n")[2]}`);
 console.log("---");
 
 try {

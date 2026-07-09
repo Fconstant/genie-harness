@@ -37,8 +37,9 @@ function appendHistory(entry: SessionMessage): void {
 
 // ── Step display ──────────────────────────────────────────────────
 function formatToolSummary(toolCall: any): string {
-  const name = toolCall.toolName || "unknown";
-  const input = toolCall.input;
+  const payload = toolCall?.payload ?? {};
+  const name = payload.toolName || "unknown";
+  const input = payload.args;
   if (!input || Object.keys(input).length === 0) return name;
   const args = Object.entries(input)
     .map(([k, v]) => `${k}=${JSON.stringify(String(v))}`)
@@ -47,8 +48,9 @@ function formatToolSummary(toolCall: any): string {
 }
 
 function createStepHandler(maxSteps: number): (step: any) => void {
+  let n = 0;
   return (step) => {
-    const n = step.stepNumber + 1;
+    n += 1;
     const totalSteps = maxSteps;
 
     if (step.toolCalls && step.toolCalls.length > 0) {
@@ -72,7 +74,7 @@ async function main() {
 
   console.log(`${GRAY}🧞 Cursed Genie — interactive mode${RESET}`);
   console.log(
-    `${GRAY}Curse: ${curse.split("\n")[3]}${RESET}`,
+    `${GRAY}Curse: ${curse.split("\n")[2]}${RESET}`,
   );
   console.log(
     `${GRAY}Type multiline prompt, empty line to submit. 'exit' or 'quit' to leave.${RESET}\n`,
@@ -86,6 +88,7 @@ async function main() {
 
   // Accumulate lines until empty-line submit
   let lines: string[] = [];
+  let generating = false;
   rl.prompt();
 
   rl.on("line", async (line) => {
@@ -109,36 +112,7 @@ async function main() {
       }
       const prompt = lines.join("\n");
       lines = [];
-
-      // Append user message to history
-      const userMsg: SessionMessage = { role: "user", content: prompt };
-      history.push(userMsg);
-      appendHistory(userMsg);
-
-      try {
-        const onStepFinish = createStepHandler(maxSteps);
-        const result = await generate(agent, history, {
-          maxSteps,
-          onStepFinish,
-        });
-
-        // Display final result
-        console.log(`\n${GREEN}${result.text}${RESET}\n`);
-        console.log(
-          `${GRAY}Steps: ${result.steps.length}, Finish: ${result.finishReason}${RESET}\n`,
-        );
-
-        // Append assistant message to history
-        const assistantMsg: SessionMessage = {
-          role: "assistant",
-          content: result.text,
-        };
-        history.push(assistantMsg);
-        appendHistory(assistantMsg);
-      } catch (err) {
-        console.error(`${RED}Agent error:${RESET}`, err);
-      }
-
+      await submit(prompt);
       rl.prompt();
       return;
     }
@@ -149,7 +123,54 @@ async function main() {
     rl.prompt();
   });
 
-  rl.on("close", () => {
+  async function submit(prompt: string): Promise<void> {
+    const userMsg: SessionMessage = { role: "user", content: prompt };
+    history.push(userMsg);
+    appendHistory(userMsg);
+
+    generating = true;
+    try {
+      const onStepFinish = createStepHandler(maxSteps);
+      const result = await generate(agent, history, {
+        maxSteps,
+        onStepFinish,
+      });
+
+      // Display final result
+      console.log(`\n${GREEN}${result.text}${RESET}\n`);
+      console.log(
+        `${GRAY}Steps: ${result.steps.length}, Finish: ${result.finishReason}${RESET}\n`,
+      );
+
+      // Append assistant message to history
+      const assistantMsg: SessionMessage = {
+        role: "assistant",
+        content: result.text,
+      };
+      history.push(assistantMsg);
+      appendHistory(assistantMsg);
+    } catch (err) {
+      console.error(`${RED}Agent error:${RESET}`, err);
+    } finally {
+      generating = false;
+    }
+  }
+
+  rl.on("close", async () => {
+    // Headless/scripting: if stdin was piped, flush any buffered prompt.
+    // If a generation is already in flight (triggered by the piped input),
+    // wait for it to finish instead of killing the process.
+    if (lines.length > 0) {
+      const prompt = lines.join("\n");
+      lines = [];
+      console.log(`${GREEN}> ${RESET}${GRAY}${prompt.replace(/\n/g, " ⏎ ")}${RESET}`);
+      await submit(prompt);
+    } else if (generating) {
+      // Wait for the in-flight generation triggered by piped input.
+      while (generating) {
+        await new Promise((r) => setTimeout(r, 100));
+      }
+    }
     process.exit(0);
   });
 
