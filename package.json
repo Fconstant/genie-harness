@@ -1,6 +1,6 @@
 {
-  "name": "mini-harness",
-  "module": "index.ts",
+  "name": "genie",
+  "module": "src/index.ts",
   "type": "module",
   "private": true,
   "bin": "./src/cli.ts",

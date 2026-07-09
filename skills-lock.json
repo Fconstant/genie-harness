@@ -6,6 +6,12 @@
       "sourceType": "github",
       "skillPath": "skills/codebase-documenter/SKILL.md",
       "computedHash": "42f8267717c269dd643a1e3c179ffdab09783bd10469deea83852dda8a1b22cd"
+    },
+    "goal-plan": {
+      "source": "ruvnet/ruflo",
+      "sourceType": "github",
+      "skillPath": "plugins/ruflo-goals/skills/goal-plan/SKILL.md",
+      "computedHash": "158c5103bb11b13c3abf9cc7b41675e98558af5e0fc1f0df3a6eb742b2389688"
     }
   }
 }
