@@ -33,7 +33,7 @@ You should see a randomly-selected curse printed, then the genie's (themed) resp
 ## Project Structure
 
 ```
-quiet-planet/
+genie-harness/
 ├── src/
 │   ├── index.ts        # One-shot entry: parse argv, run a single wish
 │   ├── cli.ts          # Interactive REPL: multi-turn chat + history (`.genie/`)
@@ -61,9 +61,9 @@ Copy `.env.example` to `.env` and set:
 
 ## Key Concepts
 
-- **The Curse** — each session picks one persona from `CURSE_THEMES` in `src/curse.ts:1`. The persona is baked into the agent's system instructions and applied to everything the genie produces. It changes per run (seeded by `Date.now()`).
-- **The Sandbox** — every tool path is resolved under `SANDBOX_DIR` and validated so it cannot escape (see `resolve()` in `src/tools.ts:9`). The genie literally cannot touch files outside it.
-- **Agent loop** — `generate()` in `src/engine.ts:43` runs the model up to `maxSteps` times, letting it call tools repeatedly until the wish is "granted".
+- **The Curse** — each session picks one persona from `CURSE_THEMES` in `src/curse.ts`. The persona is baked into the agent's system instructions and applied to everything the genie produces. It changes per run (seeded by `Date.now()`).
+- **The Sandbox** — every tool path is resolved under `SANDBOX_DIR` and validated so it cannot escape (see `resolve()` in `src/tools.ts`). The genie literally cannot touch files outside it.
+- **Agent loop** — `generate()` in `src/engine.ts` runs the model up to `maxSteps` times, letting it call tools repeatedly until the wish is "granted".
 
 ## Common Tasks
 
