@@ -12,6 +12,12 @@
       "sourceType": "github",
       "skillPath": "plugins/ruflo-goals/skills/goal-plan/SKILL.md",
       "computedHash": "158c5103bb11b13c3abf9cc7b41675e98558af5e0fc1f0df3a6eb742b2389688"
+    },
+    "greploop": {
+      "source": "greptileai/skills",
+      "sourceType": "github",
+      "skillPath": "greploop/SKILL.md",
+      "computedHash": "13849c1cfc853dd4ebdef9caa05e73ea322355dcee6114df64879fdf37ad6f19"
     }
   }
 }
